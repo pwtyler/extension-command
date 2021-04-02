@@ -207,4 +207,15 @@ Feature: Update WordPress plugins
       Error: 
       """
 
-    
+    ## Multiple plugin updates that error should not report a success
+    And I run `wp plugin install wordpress-importer --version=0.5 --force`
+    And I run `chmod -w wp-content/plugins/wordpress-importer`
+    And I try `wp plugin update --all`
+    And save STDERR as {ERROR}
+    And I run `chmod +w wp-content/plugins/wordpress-importer`
+
+    And I run `echo "{ERROR}"`
+    Then STDOUT should contain:
+      """
+      Error: Only updated 1 of 2 plugins.
+      """
